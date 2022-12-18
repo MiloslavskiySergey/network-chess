@@ -3,10 +3,12 @@
 from tkinter import Canvas, PhotoImage, Tk, font
 from typing import Literal
 
+from PIL import Image, ImageTk
 from settings import IMAGES_DIR
 
 from os.path import join
 import inspect
+
 
 left_desk = 50
 botton_desk = 450
@@ -102,7 +104,7 @@ def load_image(file_name, images, row, column) -> Literal[1, 0]:
     image_x = left_desk + (column + 0.5) * cell_size
     image_y = botton_desk - (row + 0.5) * cell_size
     try:
-        photo_image = PhotoImage(file_name)
+        photo_image = ImageTk.PhotoImage(Image.open(file_name))
         photo_images.append(photo_image)
         image = canv.create_image(image_x, image_y, image=photo_image)
         images.append(image)
