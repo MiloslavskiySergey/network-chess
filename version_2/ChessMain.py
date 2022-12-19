@@ -6,6 +6,7 @@ It will be responsible for handling user input and displaying the current GameSt
 import pygame as p
 import ChessEngine
 from settings import IMAGES_DIR
+
 from os.path import join
 
 WIDTH = HEIGNT = 512
@@ -15,7 +16,7 @@ MAX_FPS = 15
 IMAGES = {}
 
 
-def load_images():
+def load_images() -> None:
     """Load images."""
     pieces = ['whitePawn', 'whiteRook', 'whiteKnight', 'whiteBishop', 'whiteKing', 'whiteQueen',
               'blackPawn', 'blackRook', 'blackKnight', 'blackBishop', 'blackKing', 'blackQueen']
@@ -23,7 +24,7 @@ def load_images():
         IMAGES[piece] = p.transform.scale(p.image.load(join(IMAGES_DIR, 'figures', f'{piece}.png')), (SQ_SIZE, SQ_SIZE))
 
 
-def main():
+def main() -> None:
     """Point run."""
     p.init()
     p.display.set_caption('Game chess')
@@ -43,13 +44,13 @@ def main():
         p.display.flip()
 
 
-def draw_game_state(screen, gs):
+def draw_game_state(screen, gs) -> None:
     """Responsible for all the graphics within a current game state."""
     draw_board(screen)
     draw_pieces(screen, gs.board)
 
 
-def draw_board(screen):
+def draw_board(screen) -> None:
     """Draw the squares on the board."""
     colors = [p.Color('white'), p.Color('gray')]
     for row in range(DIMENSION):
@@ -58,7 +59,7 @@ def draw_board(screen):
             p.draw.rect(screen, color, p.Rect(column * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
-def draw_pieces(screen, board):
+def draw_pieces(screen, board) -> None:
     """Draw the pieces on the board using the current GameState.board."""
     for row in range(DIMENSION):
         for column in range(DIMENSION):
