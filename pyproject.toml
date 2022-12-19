@@ -9,6 +9,7 @@ packages = [{include = "network_chess"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 pillow = "^9.3.0"
+pygame = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^5.0.4"
