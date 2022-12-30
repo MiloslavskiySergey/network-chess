@@ -58,7 +58,7 @@ class GameState():
             elif move.piece_moved == 'blackKing':
                 self.black_king_location = (move.start_row, move.start_column)
 
-    def get_valid_moves(self):
+    def get_valid_moves(self,) -> list:
         """All moves considering checks."""
         # generate all possible moves
         moves = []
@@ -79,7 +79,7 @@ class GameState():
                 piece_checking = self.board[check_row][check_column]  # enemy piece causing the check
                 valid_squares = []  # squares that pieces can move to
                 # if knight, must capture knight or move king, other pieces can be blocked
-                if piece_checking[1] == 'Knight':
+                if piece_checking[5:] == 'Knight':
                     valid_squares = [(check_row, check_column)]
                 else:
                     for index in range(1, 8):
@@ -88,16 +88,16 @@ class GameState():
                         if valid_square[0] == check_row and valid_square[1] == check_column:
                             break
                 for index in range(len(moves) - 1, -1, -1):
-                    if moves[index].piece_moved[1] == 'King':
-                        if not (moves[index].end_row, moves[index].end_column) in valid_squares:
-                            moves.remove(moves[index])
+                    if moves[index].piece_moved[5:] != 'King' and \
+                            ((moves[index].end_row, moves[index].end_column) not in valid_squares):
+                        moves.remove(moves[index])
             else:
                 self.get_king_moves(king_row, king_column, moves)
         else:
             moves = self.get_all_possible_moves()
         return moves
 
-    def get_all_possible_moves(self):
+    def get_all_possible_moves(self) -> list:
         """All moves without considering checks."""
         moves = []
         for row in range(len(self.board)):
@@ -120,38 +120,36 @@ class GameState():
                 break
         # white pawn moves
         if self.white_to_move:
-            if self.board[row - 1][column] == '--':
-                if not piece_pinned or pin_direction == (-1, 0):
-                    moves.append(Move((row, column), (row - 1, column), self.board))
-                    if row == 6 and self.board[row - 2][column] == '--':
-                        moves.append(Move((row, column), (row - 2, column), self.board))
+            if self.board[row - 1][column] == '--' and (not piece_pinned or pin_direction == (-1, 0)):
+                moves.append(Move((row, column), (row - 1, column), self.board))
+                if row == 6 and self.board[row - 2][column] == '--':
+                    moves.append(Move((row, column), (row - 2, column), self.board))
             # capture to left
-            if column - 1 >= 0:
-                if self.board[row - 1][column - 1][0:5] == 'black':
-                    if not piece_pinned or pin_direction == (-1, -1):
-                        moves.append(Move((row, column), (row - 1, column - 1), self.board))
+            if column - 1 >= 0 and \
+                self.board[row - 1][column - 1][0:5] == 'black' and \
+                    (not piece_pinned or pin_direction == (-1, -1)):
+                moves.append(Move((row, column), (row - 1, column - 1), self.board))
             # capture to right
-            if column + 1 <= 7:
-                if self.board[row - 1][column + 1][0:5] == 'black':
-                    if not piece_pinned or pin_direction == (-1, 1):
-                        moves.append(Move((row, column), (row - 1, column + 1), self.board))
+            if column + 1 <= 7 and \
+                self.board[row - 1][column + 1][0:5] == 'black' and \
+                    (not piece_pinned or pin_direction == (-1, 1)):
+                moves.append(Move((row, column), (row - 1, column + 1), self.board))
         # black pawn moves
         else:
-            if self.board[row + 1][column] == '--':
-                if not piece_pinned or pin_direction == (1, 0):
-                    moves.append(Move((row, column), (row + 1, column), self.board))
-                    if row == 1 and self.board[row + 2][column] == '--':
-                        moves.append(Move((row, column), (row + 2, column), self.board))
+            if self.board[row + 1][column] == '--' and (not piece_pinned or pin_direction == (1, 0)):
+                moves.append(Move((row, column), (row + 1, column), self.board))
+                if row == 1 and self.board[row + 2][column] == '--':
+                    moves.append(Move((row, column), (row + 2, column), self.board))
             # capture to left
-            if column - 1 >= 0:
-                if self.board[row + 1][column - 1][0:5] == 'white':
-                    if not piece_pinned or pin_direction == (1, -1):
-                        moves.append(Move((row, column), (row + 1, column - 1), self.board))
+            if column - 1 >= 0 and \
+                self.board[row + 1][column - 1][0:5] == 'white' and \
+                    (not piece_pinned or pin_direction == (1, -1)):
+                moves.append(Move((row, column), (row + 1, column - 1), self.board))
             # capture to right
-            if column + 1 <= 7:
-                if self.board[row + 1][column + 1][0:5] == 'white':
-                    if not piece_pinned or pin_direction == (1, 1):
-                        moves.append(Move((row, column), (row + 1, column + 1), self.board))
+            if column + 1 <= 7 and \
+                self.board[row + 1][column + 1][0:5] == 'white' and \
+                    (not piece_pinned or pin_direction == (1, 1)):
+                moves.append(Move((row, column), (row + 1, column + 1), self.board))
 
     def get_rook_moves(self, row: int, column: int, moves: list) -> None:
         """Get all the Rook moves for the Rook located at row, column and add these moves to the list."""
@@ -261,8 +259,8 @@ class GameState():
                     else:
                         self.black_king_location = (row, column)
 
-    def check_for_pins_and_checks(self,):
-        """Returns if the player is in check, a list of pins, and a list of checks."""
+    def check_for_pins_and_checks(self,) -> tuple[bool, list, list]:
+        """Return if the player is in check, a list of pins, and a list of checks."""
         pins = []
         checks = []
         in_check = False
@@ -291,13 +289,13 @@ class GameState():
                         else:
                             break
                     elif end_piece[0:5] == enemy_color:
-                        type = end_piece[5:]
-                        if (0 <= direction <= 3 and type == 'Rook') or \
-                                (4 <= direction <= 7 and type == 'Bishop') or \
-                                (index == 1 and type == 'Pawn' and
+                        type_piece = end_piece[5:]
+                        if (0 <= direction <= 3 and type_piece == 'Rook') or \
+                                (4 <= direction <= 7 and type_piece == 'Bishop') or \
+                                (index == 1 and type_piece == 'Pawn' and
                                  ((enemy_color == 'white' and 6 <= direction <= 7) or
                                   (enemy_color == 'black' and 4 <= direction <= 5))) or \
-                                (type == 'Queen') or (index == 1 and type == 'King'):
+                                (type_piece == 'Queen') or (index == 1 and type_piece == 'King'):
                             if possible_pin == ():
                                 in_check = True
                                 checks.append((end_row, end_column, direct[0], direct[1]))
