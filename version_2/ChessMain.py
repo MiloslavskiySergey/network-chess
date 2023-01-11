@@ -4,7 +4,8 @@ It will be responsible for handling user input and displaying the current GameSt
 """
 
 import pygame as p
-import ChessEngine
+# import ChessEngine_2 as ChessEngine  # noqa
+import ChessEngine  # noqa
 from settings import IMAGES_DIR
 
 from os.path import join
@@ -56,12 +57,13 @@ def main() -> None:
                 if len(player_clicks) == 2:
                     move = ChessEngine.Move(player_clicks[0], player_clicks[1], gs.board)
                     print(move.get_chess_notation())
-                    if move in valid_moves:
-                        gs.make_move(move)
-                        move_made = True
-                        sq_selected = ()
-                        player_clicks = []
-                    else:
+                    for index in range(len(valid_moves)):
+                        if move == valid_moves[index]:
+                            gs.make_move(valid_moves[index])
+                            move_made = True
+                            sq_selected = ()
+                            player_clicks = []
+                    if not move_made:
                         player_clicks = [sq_selected]
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:

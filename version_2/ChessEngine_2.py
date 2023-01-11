@@ -4,6 +4,9 @@ It will also be responsible for dermining the valid moves at the current state. 
 """
 
 
+from typing import Any, Literal
+
+
 class GameState():
     """Game state."""
 
@@ -11,12 +14,12 @@ class GameState():
         self.board = [
             ['blackRook', 'blackKnight', 'blackBishop', 'blackQueen',
                 'blackKing', 'blackBishop', 'blackKnight', 'blackRook'],
-            ['blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'blackPawn'],
+            ['blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'blackPawn', 'whitePawn', 'blackPawn'],
             ['--', '--', '--', '--', '--', '--', '--', '--'],
             ['--', '--', '--', '--', '--', '--', '--', '--'],
             ['--', '--', '--', '--', '--', '--', '--', '--'],
             ['--', '--', '--', '--', '--', '--', '--', '--'],
-            ['whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'whitePawn'],
+            ['whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'whitePawn', 'blackPawn', 'whitePawn'],
             ['whiteRook', 'whiteKnight', 'whiteBishop', 'whiteQueen',
                 'whiteKing', 'whiteBishop', 'whiteKnight', 'whiteRook'],
         ]
@@ -45,6 +48,9 @@ class GameState():
             self.white_king_location = (move.end_row, move.end_column)
         elif move.piece_moved == 'blackKing':
             self.black_king_location = (move.end_row, move.end_column)
+        # pawn promotion
+        if move.is_pawn_promotion:
+            self.board[move.end_row][move.end_column] = move.piece_moved[0:5] + 'Queen'
 
     def undo_move(self) -> None:
         """Undo the last move made."""
@@ -327,16 +333,20 @@ class Move():
     files_to_columns = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7}
     columns_to_files = {v: k for k, v in files_to_columns.items()}
 
-    def __init__(self, start_sq: list, end_sq: list, board: list) -> None:
+    def __init__(self, start_sq: list, end_sq: list, board: list, enpassant_possible=()) -> None:
         self.start_row = start_sq[0]
         self.start_column = start_sq[1]
         self.end_row = end_sq[0]
         self.end_column = end_sq[1]
         self.piece_moved = board[self.start_row][self.start_column]
         self.piece_captured = board[self.end_row][self.end_column]
+        # pawn promotion
+        self.is_pawn_promotion = (self.piece_moved == 'whitePawn' and self.end_row == 0) or \
+            (self.piece_moved == 'blackPawn' and self.end_row == 7)
         self.move_id = self.start_row * 1000 + self.start_column * 100 + self.end_row * 10 + self.end_column
 
-    def __eq__(self, other):  # noqa
+    def __eq__(self, other) -> Any | Literal[False]:
+        """Overriding the equals method."""  # noqa
         if isinstance(other, Move):
             return self.move_id == other.move_id
         return False

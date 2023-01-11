@@ -48,6 +48,14 @@ class GameState():
         # pawn promotion
         if move.is_pawn_promotion:
             self.board[move.end_row][move.end_column] = move.piece_moved[0:5] + 'Queen'
+        # enpassant move
+        if move.is_enpassant_move:
+            self.board[move.start_row][move.end_column] = '--'
+        # update enpassant_possible variable
+        if move.piece_moved[5:] == 'Pawn' and abs(move.start_row - move.end_row) == 2:
+            self.enpassant_possible = ((move.start_row + move.end_row) // 2, move.start_column)
+        else:
+            self.enpassant_possible = ()
 
     def undo_move(self) -> None:
         """Undo the last move made."""
@@ -60,10 +68,17 @@ class GameState():
                 self.white_king_location = (move.start_row, move.start_column)
             elif move.piece_moved == 'blackKing':
                 self.black_king_location = (move.start_row, move.start_column)
+            if move.is_enpassant_move:
+                self.board[move.end_row][move.end_column] = '--'
+                self.board[move.start_row][move.end_column] = move.piece_captured
+                self.enpassant_possible = (move.end_row, move.end_column)
+            if move.piece_moved[5:] == 'Pawn' and abs(move.start_row - move.end_row) == 2:
+                self.enpassant_possible = ()
 
     def get_valid_moves(self) -> list:
         """All moves considering checks."""
         # generate all possible moves
+        temp_enpassant_possible = self.enpassant_possible
         moves = self.get_all_possible_moves()
         # for each move, make the move
         for index in range(len(moves) - 1, -1, -1):
@@ -84,6 +99,7 @@ class GameState():
         else:
             self.check_mate = False
             self.stale_mate = False
+        self.enpassant_possible = temp_enpassant_possible
         return moves
 
     def in_check(self,) -> bool:
@@ -238,6 +254,8 @@ class Move():
             (self.piece_moved == 'blackPawn' and self.end_row == 7)
         # en passant
         self.is_enpassant_move = is_enpassant_move
+        if self.is_enpassant_move:
+            self.piece_captured = 'whitePawn' if self.piece_moved == 'blackPawn' else 'blackPawn'
         self.move_id = self.start_row * 1000 + self.start_column * 100 + self.end_row * 10 + self.end_column
 
     def __eq__(self, other):
