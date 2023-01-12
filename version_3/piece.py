@@ -23,7 +23,7 @@ class Piece:
         """Func `set_texture`."""
         self.texture = join(IMAGES_DIR, f'imgs-{size}px', f'{self.color}_{self.name}.png')
 
-    def add_moves(self, move) -> None:
+    def add_move(self, move) -> None:
         """Func add move."""
         self.moves.append(move)
 

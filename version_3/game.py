@@ -38,3 +38,13 @@ class Game:
                         img_center = column * SQ_SIZE + SQ_SIZE // 2, row * SQ_SIZE + SQ_SIZE // 2
                         piece.texture_rect = img.get_rect(center=img_center)
                         surface.blit(img, piece.texture_rect)
+
+    def show_moves(self, surface):
+
+        if self.dragger.dragging:
+            piece = self.dragger.piece
+
+            for move in piece.moves:
+                color = '#C86464' if (move.final.row + move.final.column) % 2 == 0 else '#C86464'
+                rect = (move.final.column * SQ_SIZE, move.final.row * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+                pygame.draw.rect(surface, color, rect)
