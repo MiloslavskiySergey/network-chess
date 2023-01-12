@@ -298,8 +298,8 @@ class GameState():
                         type_piece = end_piece[5:]
                         if (0 <= direction <= 3 and type_piece == 'Rook') or \
                                 (4 <= direction <= 7 and type_piece == 'Bishop') or \
-                                (index == 1 and type_piece == 'Pawn' and
-                                 ((enemy_color == 'white' and 6 <= direction <= 7) or
+                                (index == 1 and type_piece == 'Pawn' and  # noqa
+                                 ((enemy_color == 'white' and 6 <= direction <= 7) or  # noqa
                                   (enemy_color == 'black' and 4 <= direction <= 5))) or \
                                 (type_piece == 'Queen') or (index == 1 and type_piece == 'King'):
                             if possible_pin == ():
