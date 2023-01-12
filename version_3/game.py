@@ -3,6 +3,7 @@
 import pygame
 from board import Board
 from const import DIMENSION, SQ_SIZE
+from dragger import Dragger
 
 
 class Game:
@@ -10,6 +11,7 @@ class Game:
 
     def __init__(self) -> None:
         self.board = Board()
+        self.dragger = Dragger()
 
     # show methods
 
@@ -30,7 +32,9 @@ class Game:
                 if self.board.squares[row][column].has_piece():
                     piece = self.board.squares[row][column].piece
 
-                    img = pygame.image.load(piece.texture)
-                    img_center = column * SQ_SIZE + SQ_SIZE // 2, row * SQ_SIZE + SQ_SIZE // 2
-                    piece.texture_rect = img.get_rect(center=img_center)
-                    surface.blit(img, piece.texture_rect)
+                    if piece is not self.dragger.piece:
+                        piece.set_texture(size=80)
+                        img = pygame.image.load(piece.texture)
+                        img_center = column * SQ_SIZE + SQ_SIZE // 2, row * SQ_SIZE + SQ_SIZE // 2
+                        piece.texture_rect = img.get_rect(center=img_center)
+                        surface.blit(img, piece.texture_rect)
