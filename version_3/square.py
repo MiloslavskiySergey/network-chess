@@ -9,6 +9,9 @@ class Square:
         self.column = column
         self.piece = piece
 
+    def __eq__(self, other):
+        return self.row == other.row and self.column == other.column
+
     def has_piece(self,) -> bool:
         """Func `has_piece`."""
         return self.piece is not None

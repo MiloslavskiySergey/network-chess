@@ -11,10 +11,26 @@ class Board:
 
     def __init__(self) -> None:
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0] for column in range(DIMENSION)]
-
+        self.last_move = None
         self._create()
         self._add_pieces('white')
         self._add_pieces('black')
+
+    def move(self, piece, move) -> None:
+        initial = move.initial
+        final = move.final
+
+        self.squares[initial.row][initial.column].piece = None
+        self.squares[final.row][final.column].piece = piece
+
+        piece.moved = True
+
+        piece.clear_moves()
+
+        self.last_move = move
+
+    def valid_move(self, piece, move) -> bool:
+        return move in piece.moves
 
     def calc_move(self, piece, row, column) -> None:
         """Func `calc_moves`."""
@@ -169,8 +185,6 @@ class Board:
         # rooks
         self.squares[row_other][0] = Square(row_other, 0, Rook(color))
         self.squares[row_other][7] = Square(row_other, 7, Rook(color))
-
-        self.squares[4][4] = Square(4, 4, King(color))
 
         # queens
         self.squares[row_other][3] = Square(row_other, 3, Queen(color))

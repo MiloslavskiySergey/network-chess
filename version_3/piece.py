@@ -27,6 +27,9 @@ class Piece:
         """Func add move."""
         self.moves.append(move)
 
+    def clear_moves(self):
+        self.moves = []
+
 
 class Pawn(Piece):
     """Clas pawn."""

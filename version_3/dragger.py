@@ -11,8 +11,8 @@ class Dragger:
         self.dragging = False
         self.mouseX = 0
         self.mouseY = 0
-        self.initional_row = 0
-        self.initional_column = 0
+        self.initial_row = 0
+        self.initial_column = 0
 
     def update_blit(self, surface: int):
         """Func `update_blit`."""
@@ -33,8 +33,8 @@ class Dragger:
 
     def save_initial(self, position: tuple) -> None:
         """Func `save_position`."""
-        self.initional_row = position[1] // SQ_SIZE
-        self.initional_column = position[0] // SQ_SIZE
+        self.initial_row = position[1] // SQ_SIZE
+        self.initial_column = position[0] // SQ_SIZE
 
     def drag_piece(self, piece) -> None:
         """Func `drag_piece`."""
