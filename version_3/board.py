@@ -1,7 +1,7 @@
 """Board file."""
 
 from const import DIMENSION
-from piece import Bishop, King, Knight, Pawn, Queen, Rook
+from piece import Bishop, King, Knight, Pawn, Queen, Rook, Piece
 from square import Square
 from move import Move
 
@@ -20,17 +20,29 @@ class Board:
         initial = move.initial
         final = move.final
 
+        # console board move update
         self.squares[initial.row][initial.column].piece = None
         self.squares[final.row][final.column].piece = piece
 
+        # pawn promotion
+        if isinstance(piece, Pawn):
+            self.check_promotion(piece, final)
+
+        # move
         piece.moved = True
 
+        # clear valid moves
         piece.clear_moves()
 
+        # set last move
         self.last_move = move
 
     def valid_move(self, piece, move) -> bool:
         return move in piece.moves
+
+    def check_promotion(self, piece: Piece, final):
+        if final.row == 0 or final.row == 7:
+            self.squares[final.row][final.column].piece = Queen(piece.color)
 
     def calc_move(self, piece, row, column) -> None:
         """Func `calc_moves`."""
