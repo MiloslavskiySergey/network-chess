@@ -28,6 +28,7 @@ class Main:
         dragger = self.game.dragger
 
         while True:
+            # show methods
             game.show_bg(screen)
             game.show_last_move(screen)
             game.show_moves(screen)
@@ -109,6 +110,12 @@ class Main:
                     # changing themes
                     if event.key == pygame.K_t:
                         game.change_theme()
+                    # changing themes
+                    if event.key == pygame.K_r:
+                        game.reset()
+                        game = self.game
+                        board = self.game.board
+                        dragger = self.game.dragger
 
                 # quit application
                 elif event.type == pygame.QUIT:
