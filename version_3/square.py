@@ -4,10 +4,22 @@
 class Square:
     """Clas square."""
 
+    ALPHACOLUMNS = {
+        0: 'a',
+        1: 'b',
+        2: 'c',
+        3: 'd',
+        4: 'e',
+        5: 'f',
+        6: 'g',
+        7: 'h'
+    }
+
     def __init__(self, row: int, column: int, piece=None) -> None:
         self.row = row
         self.column = column
         self.piece = piece
+        self.alphacolumn = self.ALPHACOLUMNS[column]
 
     def __eq__(self, other):
         return self.row == other.row and self.column == other.column
@@ -34,3 +46,17 @@ class Square:
             if arg < 0 or arg > 7:
                 return False
         return True
+
+    @staticmethod
+    def get_alphacolumn(column):
+        ALPHACOLUMNS = {
+            0: 'a',
+            1: 'b',
+            2: 'c',
+            3: 'd',
+            4: 'e',
+            5: 'f',
+            6: 'g',
+            7: 'h'
+        }
+        return ALPHACOLUMNS[column]
