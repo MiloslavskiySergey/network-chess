@@ -71,4 +71,6 @@ class King(Piece):
     """Clas king."""
 
     def __init__(self, color: str) -> None:
+        self.left_rook = None
+        self.right_rook = None
         super().__init__('king', color, 10000.0)
