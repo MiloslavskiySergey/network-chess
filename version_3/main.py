@@ -44,16 +44,19 @@ class Main:
                 # click
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     dragger.update_mouse(event.pos)
+
                     clicked_row = dragger.mouseY // SQ_SIZE
                     clicked_column = dragger.mouseX // SQ_SIZE
 
+                    # if clicked square has a piece ?
                     if board.squares[clicked_row][clicked_column].has_piece():
                         piece = board.squares[clicked_row][clicked_column].piece
-
+                        # valid piece (color) ?
                         if piece.color == game.next_player:
-                            board.calc_move(piece, clicked_row, clicked_column)
+                            board.calc_moves(piece, clicked_row, clicked_column, bool=True)
                             dragger.save_initial(event.pos)
                             dragger.drag_piece(piece)
+                            # show methods
                             game.show_bg(screen)
                             game.show_last_move(screen)
                             game.show_moves(screen)
