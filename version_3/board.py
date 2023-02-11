@@ -1,11 +1,14 @@
 """Board file."""
 
 import copy
+from os.path import join
 
 from const import DIMENSION
 from move import Move
 from piece import Bishop, King, Knight, Pawn, Piece, Queen, Rook
+from sound import Sound
 from square import Square
+from settings import SOUNDS_DIR
 
 
 class Board:
@@ -18,20 +21,33 @@ class Board:
         self._add_pieces('white')
         self._add_pieces('black')
 
-    def move(self, piece, move) -> None:
+    def move(self, piece, move, testing=False) -> None:
         initial = move.initial
         final = move.final
+
+        en_passant_empty = self.squares[final.row][final.column].isempty()
 
         # console board move update
         self.squares[initial.row][initial.column].piece = None
         self.squares[final.row][final.column].piece = piece
 
-        # pawn promotion
         if isinstance(piece, Pawn):
-            self.check_promotion(piece, final)
+            # en passant capture
+            diff = final.column - initial.column
+            if diff != 0 and en_passant_empty:
+                # console board move update
+                self.squares[initial.row][initial.column + diff].piece = None
+                self.squares[final.row][final.column].piece = piece
+                if not testing:
+                    sound = Sound(join(SOUNDS_DIR, 'capture.wav'))
+                    sound.play()
+
+            # pawn promotion
+            else:
+                self.check_promotion(piece, final)
 
         # king castling
-        if isinstance(piece, King) and self.castling(initial, final):
+        if isinstance(piece, King) and self.castling(initial, final) and not testing:
             diff = final.column - initial.column
             rook = piece.left_rook if (diff < 0) else piece.right_rook
             self.move(rook, rook.moves[-1])
@@ -54,10 +70,21 @@ class Board:
     def castling(self, initial, final) -> bool:
         return abs(initial.column - final.column) == 2
 
+    def set_true_en_passant(self, piece):
+        if not isinstance(piece, Pawn):
+            return
+
+        for row in range(DIMENSION):
+            for column in range(DIMENSION):
+                if isinstance(self.squares[row][column].piece, Pawn):
+                    self.squares[row][column].piece.en_passant = False
+
+        piece.en_passant = True
+
     def in_check(self, piece, move) -> bool:
         temp_piece = copy.deepcopy(piece)
         temp_board = copy.deepcopy(self)
-        temp_board.move(temp_piece, move)
+        temp_board.move(temp_piece, move, testing=True)
 
         for row in range(DIMENSION):
             for column in range(DIMENSION):
@@ -70,7 +97,7 @@ class Board:
         return False
 
     def calc_moves(self, piece, row, column, bool=True) -> None:
-        """Func `calc_moves`."""
+        """Calculate all the possible (valid) moves of an specific piece on a specific position."""
 
         def pawn_moves() -> None:
             # steps
@@ -124,6 +151,52 @@ class Board:
                     else:
                         # append new move
                         piece.add_move(move)
+
+            # en passant moves
+            r = 3 if piece.color == 'white' else 4
+            fr = 2 if piece.color == 'white' else 5
+            # left en passant
+            if Square.in_range(column - 1) and row == r:
+                if self.squares[row][column - 1].has_enamy_piece(piece.color):
+                    p = self.squares[row][column - 1].piece
+                    print(p.en_passant)
+                    if isinstance(p, Pawn):
+                        if p.en_passant:
+                            # create initial and final move squares
+                            initial = Square(row, column)
+                            final = Square(fr, column - 1, p)
+                            # create a new move
+                            move = Move(initial, final)
+
+                            # check potencial checks
+                            if bool:
+                                if not self.in_check(piece, move):
+                                    # append new move
+                                    piece.add_move(move)
+                            else:
+                                # append new move
+                                piece.add_move(move)
+
+            # right en passant
+            if Square.in_range(column + 1) and row == r:
+                if self.squares[row][column + 1].has_enamy_piece(piece.color):
+                    p = self.squares[row][column + 1].piece
+                    if isinstance(p, Pawn):
+                        if p.en_passant:
+                            # create initial and final move squares
+                            initial = Square(row, column)
+                            final = Square(fr, column + 1, p)
+                            # create a new move
+                            move = Move(initial, final)
+
+                            # check potencial checks
+                            if bool:
+                                if not self.in_check(piece, move):
+                                    # append new move
+                                    piece.add_move(move)
+                            else:
+                                # append new move
+                                piece.add_move(move)
 
         def knight_moves() -> None:
             """Knight_moves."""

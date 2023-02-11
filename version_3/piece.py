@@ -27,7 +27,7 @@ class Piece:
         """Func add move."""
         self.moves.append(move)
 
-    def clear_moves(self):
+    def clear_moves(self) -> None:
         self.moves = []
 
 
@@ -36,6 +36,7 @@ class Pawn(Piece):
 
     def __init__(self, color: str) -> None:
         self.dir = -1 if color == 'white' else 1
+        self.en_passant = False
         super().__init__('pawn', color, 1.0)
 
 
